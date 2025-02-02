@@ -16,3 +16,8 @@ tasks:
     cmds:
       - task: ecma:eslint-fix
       - task: ecma:prettier-fix
+
+  git-push:
+    cmds:
+      - git remote set-url origin git@github.com:Pistonight/shared-controls
+      - git push
