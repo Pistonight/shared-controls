@@ -31,34 +31,17 @@ export type ResizeLayoutProps = {
 >;
 
 const useStyles = makeStyles({
-    container: {
-        display: "flex",
-    },
-    containerVertical: {
-        flexDirection: "column",
-    },
-    containerHorizontal: {
-        flexDirection: "row",
-    },
+    container: { display: "flex" },
+    containerVertical: { flexDirection: "column" },
+    containerHorizontal: { flexDirection: "row" },
     childContainer: {
         // needed to anchor drag handle with position: absolute
         position: "relative",
     },
-    secondChild: {
-        flex: 1,
-    },
-    dragHandle: {
-        position: "absolute",
-        transition: "background-color 0.2s",
-    },
-    dragHandleFirst: {
-        bottom: 0,
-        right: 0,
-    },
-    dragHandleSecond: {
-        top: 0,
-        left: 0,
-    },
+    secondChild: { flex: 1 },
+    dragHandle: { position: "absolute", transition: "background-color 0.2s" },
+    dragHandleFirst: { bottom: 0, right: 0 },
+    dragHandleSecond: { top: 0, left: 0 },
     dragHandleVertical: {
         // for vertical resize, the handle itself is "horizontal"
         width: "100%",
@@ -79,14 +62,8 @@ const useStyles = makeStyles({
     //     transition: "background-color 0.2s",
     //     display: "flex",
     // },
-    dragHandleTouchVertical: {
-        height: "20px",
-        width: "100%",
-    },
-    dragHandleTouchHorizontal: {
-        width: "20px",
-        height: "100%",
-    },
+    dragHandleTouchVertical: { height: "20px", width: "100%" },
+    dragHandleTouchHorizontal: { width: "20px", height: "100%" },
 });
 
 /**
@@ -255,16 +232,10 @@ export const ResizeLayout: React.FC<PropsWithChildren<ResizeLayoutProps>> = ({
 const getEventClientCoords = (e: React.TouchEvent | React.MouseEvent) => {
     if ("touches" in e && e.touches[0]) {
         const touch = e.touches[0];
-        return {
-            clientX: touch.clientX,
-            clientY: touch.clientY,
-        };
+        return { clientX: touch.clientX, clientY: touch.clientY };
     }
     if ("clientX" in e && "clientY" in e) {
-        return {
-            clientX: e.clientX,
-            clientY: e.clientY,
-        };
+        return { clientX: e.clientX, clientY: e.clientY };
     }
     return undefined;
 };
