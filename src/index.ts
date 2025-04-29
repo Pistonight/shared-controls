@@ -3,3 +3,5 @@ export * from "./GitHubLink.tsx";
 export * from "./LanguagePicker.tsx";
 export * from "./ResizeLayout.tsx";
 export * from "./ThemeProvider.tsx";
+export * from "./MenuSwitch.tsx";
+export * from "./loader.ts";

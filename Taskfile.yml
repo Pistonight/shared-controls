@@ -13,6 +13,12 @@ tasks:
   fix:
     cmds:
       - task: ecma:mono-fix
+      - pnpm exec mono-langtool src/strings --no-confirm
+
+  edit:
+    desc: Make edits to the translation files
+    cmds:
+      - pnpm exec mono-langtool src/strings {{.CLI_ARGS}}
 
   git-push:
     cmds:

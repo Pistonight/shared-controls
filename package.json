@@ -11,7 +11,8 @@
         "@fluentui/react-icons": "catalog:",
         "@pistonite/pure": "catalog:",
         "@pistonite/pure-react": "catalog:",
-        "react": "catalog:"
+        "react": "catalog:",
+        "react-i18next": "catalog:"
     },
     "devDependencies": {
         "@types/react": "catalog:",
