@@ -28,6 +28,8 @@ export const LanguagePicker: React.FC<CommonProps> = ({ as = "button" }) => {
     const { t } = useTranslation(namespace);
     return (
         <Menu
+            hoverDelay={as === "submenu" ? 20 : undefined}
+            openOnHover={as === "submenu"}
             checkedValues={{ locale: [locale] }}
             onCheckedValueChange={async (_, { checkedItems }) => {
                 setLocale(checkedItems[0]);
