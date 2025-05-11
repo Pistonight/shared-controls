@@ -13,6 +13,7 @@ const ACCELERATION = 1.6;
 export const useScroll = (
     getter: () => number,
     setter: (scroll: number) => void,
+    getMax: () => number,
 ) => {
     const scrollStartTime = useRef(0);
     const scrollTarget = useRef(0);
@@ -20,7 +21,13 @@ export const useScroll = (
     const isScrolling = useRef(false);
 
     const scrollTo = (target: number) => {
-        scrollTarget.current = target;
+        const max = getMax();
+        if (max <= 0) {
+            // the element is not scrollable
+            return;
+        }
+
+        scrollTarget.current = Math.max(0, Math.min(target, max));
         scrollStartTime.current = performance.now();
         if (isScrolling.current) {
             return;
@@ -75,7 +82,7 @@ export const useScroll = (
         };
         doScroll();
     };
-    const scrollToMemo = useCallback(scrollTo, [getter, setter]);
+    const scrollToMemo = useCallback(scrollTo, [getter, setter, getMax]);
 
     return { scrollTarget, isScrolling, scrollTo: scrollToMemo };
 };
@@ -106,6 +113,12 @@ export const useSwappedWheelScrollDirection = () => {
         },
         [elementRef],
     );
+    const getMaxH = useCallback(() => {
+        if (!elementRef) {
+            return 0;
+        }
+        return elementRef.scrollWidth - elementRef.clientWidth;
+    }, [elementRef]);
     const getterV = useCallback(() => {
         return elementRef?.scrollTop || 0;
     }, [elementRef]);
@@ -118,31 +131,31 @@ export const useSwappedWheelScrollDirection = () => {
         },
         [elementRef],
     );
+    const getMaxV = useCallback(() => {
+        if (!elementRef) {
+            return 0;
+        }
+        return elementRef.scrollHeight - elementRef.clientHeight;
+    }, [elementRef]);
 
     const {
         scrollTarget: scrollTargetH,
         isScrolling: isScrollingH,
         scrollTo: scrollToH,
-    } = useScroll(getterH, setterH);
+    } = useScroll(getterH, setterH, getMaxH);
     const {
         scrollTarget: scrollTargetV,
         isScrolling: isScrollingV,
         scrollTo: scrollToV,
-    } = useScroll(getterV, setterV);
+    } = useScroll(getterV, setterV, getMaxV);
     const handler = useCallback(
         (e: WheelEvent) => {
             e.preventDefault();
             if (!e.deltaY || !elementRef) {
                 return;
             }
-            const vertical = e.shiftKey;
-            const max = vertical
-                ? elementRef.scrollHeight - elementRef.clientHeight
-                : elementRef.scrollWidth - elementRef.clientWidth;
-            if (max <= 0) {
-                return;
-            }
             let current;
+            const vertical = e.shiftKey;
             if (vertical) {
                 current = isScrollingV.current
                     ? scrollTargetV.current
@@ -152,8 +165,7 @@ export const useSwappedWheelScrollDirection = () => {
                     ? scrollTargetH.current
                     : elementRef.scrollLeft;
             }
-            const target = Math.max(Math.min(current + e.deltaY, max), 0);
-            (vertical ? scrollToV : scrollToH)(target);
+            (vertical ? scrollToV : scrollToH)(current + e.deltaY);
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [elementRef],
