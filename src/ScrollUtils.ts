@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 // These are random values I picked that felt good
 const MAX_SPEED = 200;
-const ACCELERATION = 1.6;
+const ACCELERATION = 6.4;
 
 /**
  * Smooth scrolling implementation
@@ -28,7 +28,9 @@ export const useScroll = (
         }
 
         scrollTarget.current = Math.max(0, Math.min(target, max));
-        scrollStartTime.current = performance.now();
+
+        const startTime = performance.now();
+        scrollStartTime.current = startTime;
         if (isScrolling.current) {
             return;
         }
@@ -36,7 +38,8 @@ export const useScroll = (
         // to ensure oscilation does not happen to cause high CPU usage,
         // we hard cap the scrolling time to 2 seconds
         const doScroll = () => {
-            const elapsed = performance.now() - scrollStartTime.current;
+            const currentTime = performance.now();
+            const elapsed = currentTime - scrollStartTime.current;
             if (elapsed > 2000) {
                 console.warn(
                     `[shared-controls] scrolling took too long! (${elapsed}ms)`,
@@ -49,24 +52,28 @@ export const useScroll = (
             const current = getter();
             const currentTarget = scrollTarget.current;
             let next = current;
+            const currentSpeed = scrollSpeed.current;
+            const currentSpeedPlus = currentSpeed + ACCELERATION;
+            const nTicks = Math.ceil(currentSpeedPlus / ACCELERATION);
             const slowDownThreshold =
-                (scrollSpeed.current * scrollSpeed.current) / ACCELERATION / 2;
-            if (Math.abs(currentTarget - current) <= slowDownThreshold) {
+                nTicks * (currentSpeedPlus - ((nTicks - 1) * ACCELERATION) / 2);
+            const remaining = Math.abs(currentTarget - current);
+            if (remaining <= slowDownThreshold) {
                 // start slowing down
                 scrollSpeed.current = Math.max(
                     ACCELERATION,
-                    scrollSpeed.current - ACCELERATION,
+                    currentSpeed - ACCELERATION,
                 );
-            } else if (scrollSpeed.current < MAX_SPEED) {
-                scrollSpeed.current = Math.min(
-                    MAX_SPEED,
-                    scrollSpeed.current + ACCELERATION,
-                );
+            } else if (
+                remaining > slowDownThreshold + currentSpeedPlus &&
+                currentSpeed < MAX_SPEED
+            ) {
+                scrollSpeed.current = Math.min(MAX_SPEED, currentSpeedPlus);
             }
             if (currentTarget > current) {
-                next = Math.min(currentTarget, current + scrollSpeed.current);
+                next = Math.min(currentTarget, current + currentSpeed);
             } else {
-                next = Math.max(currentTarget, current - scrollSpeed.current);
+                next = Math.max(currentTarget, current - currentSpeed);
             }
             if (Math.abs(currentTarget - next) <= ACCELERATION) {
                 // near target, stop
@@ -78,7 +85,7 @@ export const useScroll = (
             }
             setter(next);
             // continue scrolling
-            requestAnimationFrame(doScroll);
+            setTimeout(doScroll, 10);
         };
         doScroll();
     };
