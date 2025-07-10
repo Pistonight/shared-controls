@@ -7,3 +7,4 @@ export * from "./ThemeProvider.tsx";
 export * from "./MenuSwitch.tsx";
 export * from "./ScrollUtils.ts";
 export * from "./loader.ts";
+export * from "./gale.ts";
